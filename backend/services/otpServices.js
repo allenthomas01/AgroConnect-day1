@@ -25,7 +25,7 @@ class otpService{
              code: otpCode,
              createdAt: new Date(),
           });
-           otp.save({ timeout: 30000 });// otp deletes after 5 minutes
+           otp.save({ timeout: 60000 });// otp deletes after 10 minutes
            return otpCode;
         }catch(err){
             throw err;

@@ -7,7 +7,7 @@ const OTPModel = require('../model/otpModel');
 exports.register = async (req, res, next) => {
   try {
     console.log("---req body---", req.body);
-    const { userType, name, phone, password, district, taluk, block, kb, wardno, enteredCode } = req.body;
+    const { userType, name, phone, password, district, taluk, block, kb, wardno} = req.body;
 
     let response;
 
@@ -16,39 +16,44 @@ exports.register = async (req, res, next) => {
       if (duplicate) {
         throw new Error(`UserName ${phone}, Already Registered`);
       }
-      const generatedCode = await otpService.generateAndSendOTP(phone);
 
-      if (generatedCode !== enteredCode) {
-        throw new Error('Invalid OTP');
-      }
       response = await farmerService.registerFarmer(name, phone, password, district, taluk, block, kb, wardno);
     } else if (userType === 'member') {
       const duplicate = await memberService.getUserByPhone(phone);
       if (duplicate) {
         throw new Error(`UserName ${phone}, Already Registered`);
       }
-      const generatedCode = await otpService.generateAndSendOTP(phone);
 
-      if (generatedCode !== enteredCode) {
-        throw new Error('Invalid OTP');
-      }
       response = await memberService.registerMember(name, phone, password, district, taluk, block, kb, wardno);
     } else if (userType === 'officer') {
       const duplicate = await officerService.getUserByPhone(phone);
       if (duplicate) {
         throw new Error(`UserName ${phone}, Already Registered`);
       }
-      const generatedCode = await otpService.generateAndSendOTP(phone);
 
-      if (generatedCode !== enteredCode) {
-        throw new Error('Invalid OTP,  Registration failed');
-      }
       response = await officerService.registerOfficer(name, phone, password, district, taluk, block, kb, wardno);
     } else {
       throw new Error('Registration failed');
     }
+    const generatedCode = await otpService.generateAndSendOTP(phone);
+    res.json({ status: true, success: `OTP sent successfully`});
+  } catch (err) {
+    console.log("---> err -->", err);
+    next(err);
+  }
+};
 
-    res.json({ status: true, success: `${userType} registered successfully` });
+
+exports.verify = async (req, res, next) => {
+  try {
+    console.log("---req body---", req.body);
+    const { enteredCode} = req.body;
+    const savedOTP = await otpService.verifyOTP(phone,enteredCode);
+    if (!savedOTP) {
+      throw new Error('OTP invalid');
+    }
+
+    res.json({ status: true, success: `${userType} registered successfully`});
   } catch (err) {
     console.log("---> err -->", err);
     next(err);

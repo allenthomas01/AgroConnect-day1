@@ -3,6 +3,7 @@ const userController = require('../controller/userController');
 
 router.post('/registeruser',userController.register);
 router.post('/login', userController.login);
+router.post('/verify',userController.verify);
 router.post('/farmerforgotPassword', userController.forgotPassword);
 router.post('/farmerresetPassword', userController.resetPassword); 
 

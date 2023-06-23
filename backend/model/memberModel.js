@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const db = require('../config/db');
+const bcrypt = require('bcrypt');
 
 const { Schema }=mongoose;
 
@@ -39,6 +40,32 @@ const memberSchema = new Schema({
         required: [true, "ward number is required"]
     }
 },{timestamps:true});
+
+memberSchema.pre("save",async function(){
+    var user = this;
+    if(!user.isModified("password")){
+        return
+    }
+    try{
+        const salt = await bcrypt.genSalt(10);
+        const hash = await bcrypt.hash(user.password,salt);
+
+        user.password = hash;
+    }catch(err){
+        throw err;
+    }
+});
+
+memberSchema.methods.comparePassword = async function (candidatePassword) {
+    try {
+        console.log('----------------no password',this.password);
+        // @ts-ignore
+        const isMatch = await bcrypt.compare(candidatePassword, this.password);
+        return isMatch;
+    } catch (error) {
+        throw error;
+    }
+};
 
 const memberModel = db.model('member',memberSchema);
 
