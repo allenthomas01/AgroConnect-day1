@@ -2,6 +2,7 @@
 
 const app = require('./app');
 const db = require('./config/db')
+const cloudinary = require('./config/cloudinaryConfig');
 const farmerModel = require('./model/farmerModel');
 const officerModel = require('./model/officerModel');
 const memberModel = require('./model/memberModel');

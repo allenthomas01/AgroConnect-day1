@@ -1,12 +1,14 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 const scrapeModel = require('../model/scrapeModel');
+let errorMessage;
+let response;
 
 class scrapeService {
   static async getData() {
     try {
       const url = 'https://keralaagriculture.gov.in/en/10951-2/';
-      const response = await axios.get(url);
+       response = await axios.get(url);
       const html = response.data;
       const $ = cheerio.load(html);
       const englishTextArray = [];
@@ -23,7 +25,10 @@ class scrapeService {
       const createNotification = new scrapeModel({ data: englishTextArray });
       return await createNotification.save();
     } catch (err) {
-      throw err;
+      errorMessage = `\n\nError: Saving scraped data to database failed.\n\n`;
+      console.log(errorMessage);
+      //res.status(400).json({ error: errorMessage });
+      return; // Stop further execution of the code
     }
   }
 
@@ -31,11 +36,15 @@ class scrapeService {
     try {
       const savedData = await scrapeModel.findOne().sort({ _id: -1 }).exec();
       if (!savedData) {
-        throw new Error('No data found');
+        errorMessage = `\n\nError: No data found\n\n`;
+        console.log(errorMessage);
       }
       return savedData.data;
     } catch (err) {
-      throw err;
+      errorMessage = `\n\nError: Fetching scraped data from database failed.\n\n`;
+      console.log(errorMessage);
+      //res.status(400).json({ error: errorMessage });
+      return; // Stop further execution of the code
     }
   }
 }

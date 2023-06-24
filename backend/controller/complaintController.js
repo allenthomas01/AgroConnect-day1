@@ -1,12 +1,12 @@
 const complaintService = require('../services/complaintServices');
+let response;
 
-
-
+//registering complaint successfull
 exports.complaint = async (req, res, next) => {
     try {
         console.log("---req body---", req.body);
         const { complaintText } = req.body;
-        const response = await complaintService.registerComplaint(complaintText);
+        response= await complaintService.registerComplaint(complaintText);
 
         res.json({ status: true, success: 'Complaint registered successfully'});
     } catch (err) {
@@ -16,12 +16,13 @@ exports.complaint = async (req, res, next) => {
 }
 
 
-
+//viewing complaint successfull
 exports.viewComplaints = async (req, res, next) => {
   try {
     // Fetch all existing complaints
-    const allComplaints = await complaintService.viewComplaints();
-    console.log("Existing complaints:", allComplaints);
+    response = await complaintService.viewComplaints();
+    console.log("\n\nExisting complaints:\n\n", response);
+    res.json({ status: true, success: 'Complaints fetched successfully',response:response});
   } catch (err) {
     console.log("---> err -->", err);
     next(err);

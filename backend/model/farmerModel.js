@@ -4,6 +4,8 @@ const bcrypt = require('bcrypt');
 
 const { Schema }=mongoose;
 
+let errorMessage;
+
 //changed userSchema to farmerSchema
 const farmerSchema = new Schema({
     name: {
@@ -53,7 +55,9 @@ farmerSchema.pre("save",async function(){
 
         user.password = hash;
     }catch(err){
-        throw err;
+        errorMessage = `Error: Hashing password before saving failed.`;
+        res.status(400).json({ error: errorMessage });
+        return; // Stop further execution of the code
     }
 });
 
@@ -61,12 +65,14 @@ farmerSchema.pre("save",async function(){
 //used while signIn decrypt
 farmerSchema.methods.comparePassword = async function (candidatePassword) {
     try {
-        console.log('----------------no password',this.password);
+        console.log('password',this.password);
         // @ts-ignore
         const isMatch = await bcrypt.compare(candidatePassword, this.password);
         return isMatch;
     } catch (error) {
-        throw error;
+        errorMessage = `Error: Password does not match.`;
+        res.status(400).json({ error: errorMessage });
+        return; // Stop further execution of the code
     }
 };
 

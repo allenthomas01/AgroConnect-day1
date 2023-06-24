@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const db = require('../config/db');
 const bcrypt = require('bcrypt');
-
+let errorMessage;
 const { Schema }=mongoose;
 
 //changed userSchema to farmerSchema
@@ -38,7 +38,8 @@ const officerSchema = new Schema({
     wardno:{
         type:String,
         required: [true, "ward number is required"]
-    }
+    },
+    idCardPhoto: {type:String}
 },{timestamps:true});
 
 officerSchema.pre("save",async function(){
@@ -52,17 +53,25 @@ officerSchema.pre("save",async function(){
 
         user.password = hash;
     }catch(err){
-        throw err;
+        errorMessage = `Error: Hashing password before saving failed.`;
+        res.status(400).json({ error: errorMessage });
+        return; // Stop further execution of the code
     }
 });
+
+
+
 officerSchema.methods.comparePassword = async function (candidatePassword) {
     try {
-        console.log('----------------no password',this.password);
+        console.log('comparing passwords..',this.password);
         // @ts-ignore
         const isMatch = await bcrypt.compare(candidatePassword, this.password);
         return isMatch;
     } catch (error) {
-        throw error;``
+        console.log(this.errorMessage);
+        errorMessage = `Error: Password does not match.`;
+        res.status(400).json({ error: errorMessage });
+        return; // Stop further execution of the code
     }
 };
 

@@ -3,21 +3,19 @@ const body_parser = require('body-parser');
 const bcrypt = require('bcrypt');
 const morgan = require('morgan');
 const userRouter = require('./routers/userRouter');
-//const officerRouter = require('./routers/officerRouter');
-//const memberRouter = require('./routers/memberRouter');
 const scrapeRouter = require('./routers/scrapeRouter');
 const otpRouter = require('./routers/otpRouter');
 const weatherRouter = require('./routers/weatherRouter');
 const complaintRouter = require('./routers/complaintRouter');
 const memberNotificationRouter = require('./routers/memberNotificationRouter');
 const officerNotificationRouter = require('./routers/officerNotificationRouter');
-
+const fileUpload = require('express-fileupload');
 const app = express();
 app.use(body_parser.json());
+
+app.use(fileUpload());
 app.use(morgan('tiny'));
 app.use('/',userRouter);
-//app.use('/',officerRouter);
-//app.use('/',memberRouter);
 app.use('/',scrapeRouter);
 app.use('/',otpRouter);
 app.use('/',weatherRouter);

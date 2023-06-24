@@ -1,5 +1,6 @@
 const memberModel = require('../model/memberModel');
 const jwt = require("jsonwebtoken");
+let errorMessage;
 
 class memberService{
     static async registerMember(name,phone,password,district,taluk,block,kb,wardno){
@@ -7,7 +8,10 @@ class memberService{
             const createMember = new memberModel({name,phone,password,district,taluk,block,kb,wardno});
             return await createMember.save();
         }catch(err){
-            throw err;
+            errorMessage = `\n\nError: Saving member to database failed.\n\n`;
+            console.log(errorMessage);
+            //res.status(400).json({ error: errorMessage });
+            return; // Stop further execution of the code
         }
     }
 
@@ -15,7 +19,10 @@ class memberService{
         try{
             return await memberModel.findOne({phone});
         }catch(err){
-            console.log(err);
+            errorMessage = `\n\nError: No such member exist.\n\n`;
+            console.log(errorMessage);
+            //res.status(400).json({ error: errorMessage });
+            return; // Stop further execution of the code
         }
     }
 
@@ -23,7 +30,10 @@ class memberService{
         try {
             return await memberModel.findOne({phone});
         } catch (error) {
-            throw error;
+            errorMessage = `\n\nError: Member not found\n\n`;
+            console.log(errorMessage);
+            //res.status(400).json({ error: errorMessage });
+            return; // Stop further execution of the code
         }
     }
 
